@@ -1,0 +1,7 @@
+<ul class="nav nav-pills nav-stacked nav-list">
+    <li class="nav-header">Latest Posts</li>
+    {% for post in site.posts %}
+    <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+    <li class="divider"></li>
+</ul>

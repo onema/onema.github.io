@@ -1,0 +1,7 @@
+<!--Sidebar content-->
+<ul class="nav nav-pills nav-stacked nav-list">
+    <li class="nav-header">Latest Posts</li>
+    {% for post in site.posts %}
+    <li>{{ post.date | date: "%Y - %B" }} <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+</ul>
