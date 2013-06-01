@@ -1,8 +1,8 @@
 ---
-layout: sidebar
-title: Amazon Web Services: Warmingup
-category: operations
-tags: blog servers cloud
+layout: blogpost
+title: Amazon Web Services Warmingup
+category: ramblings
+tags: operations cloud
 year: 2013
 month: 5
 day: 31
@@ -12,10 +12,153 @@ description: AWS is great, but not everything is read roses... Let me tell you w
 ---
 
 <h2>Amazon Web Services: Warmingup</h2>
-<p>Last year I had the opportunity to use cloud computing with Rackspace cloud. It was really simple to create an account, and get started. Creating new load balancers, adding servers and accessing the VMs was a breeze, even using their API to fire up new instances was very simple.</p>
-<p>Mid-way through my project, I was part of the beta program for Cloud Databases. The performance was great and the fact that I didn't need to manage the DB infrastructure was well woth the $80+ a month it cost.</p>
-<p>Just like any other service, it wasn't perfect, I still had to provision and update my VMs and had to setup Capistrano to deploy my code.</p>
+<p>Last year I had the opportunity to start using cloud computing with Rackspace Cloud. 
+    It was really simple to create an account, and get started. Creating new load 
+    balancers, adding servers and accessing the VMs was a breeze, even using their 
+    API to fire up new instances was very simple.
+</p>
 
-<p>Later last year I changed jobs, and started working with a San Diego star up. They appointed me as the technical directory and needed to get up and running as fast as possible. Instead of having to deal with operations, or even with Infrastructure as a Service (IaaS), I decided to start using a PaaS. It was great because it allowed us to get our first product up and running in a matter of minutes once it was ready to be open to the public.</p>
-<p>The PaaS was a good temporary solution, but we where having performance issues, and lots of down time. My boss really wanted me to use a more reliable service and we opted to start looking into AWS as it is what all the "cool kids" are using.  The company sent me to Las Vegas to the AWS Re:Invent conference...</p>
-<p>The conference was great, every single session aimed to </p>
+<p>Mid-way through my project, I was part of the beta program for Cloud Databases. 
+    The performance was great and the fact that I didn't need to manage the DB 
+    infrastructure was well worth the $80+ a month once it came out of beta.
+</p>
+
+<p>Customer service is free, and they are available 24/7... All in all I was quite happy with them.</p>
+
+<p>But just like any other service, it wasn't perfect, I still had to provision, 
+    secure and update my VMs and had to setup Capistrano to deploy my code as they 
+    didn't have an integrated deployment system. As a developer I had an idea of how to setup 
+    systems, but it was not my forte and getting to the point where I had a production 
+    ready machine took time.
+</p>
+
+<h3>Using a Platform as a Service (PaaS)</h3>
+<p>Later last year I changed jobs and started working with a San Diego star up. 
+    They appointed me as the senior software engineer (This meant I has the project 
+    manager, dev-ops guy, security expert, lead developer, conflict mediator... soon I was in operations hell), 
+    and they needed us to build from scratch a couple projects.
+</p>
+
+<p> As a startup getting up and running fast was a must. Instead of having to deal 
+    with operations and Infrastructure as a Service (IaaS), I decided to start using 
+    a PaaS. It was the right choice at the time because it allowed us to get our 
+    first product up and running in a matter of minutes.
+</p>
+
+<h3>Dirty Little Secrets</h3>
+<p>The PaaS was a good temporary solution, but soon we were having performance 
+    issues, and more down time than we thought it was acceptable. My boss insisted 
+    that we needed to go with a more reliable service. We opted to start looking 
+    into AWS as it is what all the "cool kids" are using, plus Elastic Beanstalk 
+    sounded almost exactly like a PaaS with the extra benefit of auto-scaling which 
+    we didn't have with the PaaS. The company sent me the AWS Re:Invent conference 
+    in Las Vegas...
+</p>
+
+<p>The conference was great, every single session aimed to display the strengths 
+    of each of the services, and by the time I came back to San Diego I knew that 
+    I had to start using this amazing technology. One thing I didn't hear or learn 
+    at Re:Invent was the short comings, steep learning curve, and difficulty to 
+    transfer our systems over. You have to know that systems administration is 
+    not my main job or passion and my desire is to spend as little time as possible 
+    doing operations and more time coding.
+</p>
+
+<h3>AWS and Elastic Beanstalk: "THE" learning curve</h3>
+<p>Like I mentioned before, Elastic Beanstalk seem like the proper solution for 
+    our needs, and granted it is a good service, but doing simple stuff like using git submodules,
+    setting up a cron jobs, creating custom environment variables, installing SSL 
+    certificates in the instance, or running worker queues without a single point of 
+    failure (which is something you need to strive for when 
+    working with infrastructure on the cloud) was a challenge. 
+    Some of these things are not difficult in practice, but it was particularly 
+    hard because the documentation is difficult to navigate, it is not always clear if you don't read it ALL
+    or it doesn't cover common use cases, finally <strong>the AWS forums and web search SUCK!</strong> 
+    Don't expect to find anything quickly.
+</p>
+<p>
+    Even if you end up paying the $100 a month for support, you will spend a lot 
+    of time going back and forth with them trying to get specific use cases to work.
+</p>
+
+<h3>Things that actually Rock about AWS</h3>
+<p>
+    Without a doubt the AWS APIs are very design, and their command line tools that use these APIs
+    are easy to install and use (if you are comfortable using the *NIX terminal).
+</p>
+<p>
+    Elastic Beanstalk is a one place stop to setup a complex cloud infrastructure: 
+    Elastic Load Balancer (ELB), Auto Scaling, manual vertical and horizontal scale, 
+    adding Relational Databases, Monitoring, and edit some 
+    "Container Options" like setting the document root of the application, 
+    enabling Output compression, max execution time and environment variables 
+    with generic names. Additional options can be setup by using 
+    configuration files and placing this config files in a directory called .ebextensions.
+    If you have a rather simple application, that needs to 
+    scale quickly, you are up for a treat! Finally one of the best features is that you can 
+    deploy code as simple as:
+    <pre><code>$ git aws.push</code></pre>
+</p>
+
+<h3>OpsWorks</h3>
+<p>
+    Earlier this year AWS released a new service called OpsWorks, I was really 
+    excited about using it because you could use custom chef cookbooks to provision 
+    your instances. It is basically a managed chef service. Unfortunately as a ruby/chef 
+    noob I found the documentation scarce, support didn't have enough knowledge on 
+    this new service, and it was quite frustrating to get an application up and running. 
+    OpsWorks runs on an old version of Chef, this is quite an inconvenience if you try to 
+    use community cookbooks. But as I started to get comfortable with Chef, I wrote
+    my own recipes, granted basic, but they do what I need them to in order to 
+    deploy different applications. Deployments are super easy and can be performed 
+    directly from a branch in your hosted repository. You can host multiple 
+    applications in one or multiple machines, and setting up systems running in 
+    availability zones or regions is easier than ever. 
+</p>
+<p>
+    OpsWorks also comes with a large number of OS packages and recipes that can 
+    be used to provision your instances without having to write any code. 
+</p>
+<h3>New Features and bug fixes</h3>
+<p>
+    On a weekly basis I receive one or more emails from AWS introducing new services, 
+    features, or simple bug fixes. They are continually working on their products 
+    making them better and easier to use. 
+</p>
+
+<p>
+    It has been 6 months since I first started playing with AWS products, the 
+    road has been a rocky experience specially juggling between my other job 
+    responsibilities. But Operations get easier for me as I learn more, I spend 
+    less time going through logs of failed deployments and I'm spending more time 
+    coding, All our deployments and server provisioning is automated, we have 
+    contributed a couple github repos that address some basic use cases such as setting
+    environment variables, installing custom software, granting access control 
+    amongst other things. 
+</p>
+    
+<h3>Conclusion</h3>
+<p>
+    Today we have servers on Elastic Beanstalk, OpsWorks, and aquired through 
+    the market place in addition to these we are using Simple WorkFlow, Simple Email Service, RDS, and Route53. 
+</p>
+    
+<p>
+    If you are a person with limited experience in system administration or have 
+    a background on shared hosing or PaaS, you may find the transition to AWS a bit rough. 
+    But I will not discourage you from trying it out; experiment with some of the features, 
+    look up for community contributed tutorials or code that will enable you to 
+    get up and running faster, learn and understand the infrastructure, it will 
+    empower you as a developer.
+</p>
+<p>
+    Finally and as much as I hate to say it read the documentation.
+    As tedious as it may be, you are better off reading it all, rather than trying 
+    to find your answer in the middle of the document. It will give 
+    you a good insight of whether or not a particular service is what you need. 
+</p>
+
+<p>
+    I will start soon a series of tutorials on AWS describing how to accomplish basic 
+    setups for your servers and applications.
+</p>
