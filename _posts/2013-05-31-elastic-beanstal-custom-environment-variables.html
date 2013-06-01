@@ -1,0 +1,71 @@
+---
+layout: blogpost
+title: Elastic Beanstalk custon environment variables
+category: devops
+tags: operations aws elastic-beanstalk
+year: 2013
+month: 5
+day: 31
+published: true
+summary: Using the default environment values that Elastic Beanstalk offers is easy, but how about creating meaninful or custom names?
+description: Creating custom environment variables in AWS Elastic Beanstalk
+---
+
+    <h2>Elastic Beanstalk custon environment variables</h2>
+    <h3>Why use environment variables</h3>
+    <p>
+        When developing an application some times you want to use different configuration values 
+        between development, staging/testing, and production environments. Many modern frameworks 
+        provide easy ways to set different configurations based on what environment you are using. 
+        Further more there may be instances when you want to use API keys, secret, SMTP username and passwords, etc, 
+        that you want to keep secret and not commit to the repository. One common 
+        solution to address this problem is to set environment variables. 
+    </p>
+
+    <h3>How to set environment variables?</h3>
+    <p>
+        There are different ways to set these variables. Using Apache, for example, if you have mod_env you can set an environment variable 
+        using the <a href="http://httpd.apache.org/docs/2.2/mod/mod_env.html#setenv">SetEnv</a> directive in your .htaccess. 
+        Using PHP you could set it by using the <a href="http://php.net/manual/en/function.putenv.php">putenv</a>
+        function and use it in a file that is used on every request. 
+        In a PHP application you will have access to these values via the <code>$_SERVER</code> 
+        super global or the <a href="http://www.php.net/manual/en/function.getenv.php">getenv</a> function.
+    </p>
+    
+    <p>
+        Up until now it is still not clear how we are going to keep the value of the variables separate from our code. 
+        To do this in Elastic Beanstalk they provide by default 5 environment variables called PARAM1-5
+        that can be set through the AWS Console under Environment Details -> Edit Config -> Container
+    </p>    
+        <img src="http://i.stack.imgur.com/BeOyh.png" >
+    <p>
+        Five values can be limiting or you may want to use more meaningful names such as 
+        <code>DB_USERNAME</code> and <code>DB_PASSWORD</code>. To do this you need 
+        to use <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/customize-containers-ec2.html#customize-containers-format-options">ebextension config</a> files:
+    </p>
+    
+    <p>
+        To do this create a directory at the root of your project called <code>.ebextensions/</code>
+
+        Then create a file called environment.config (this file can be called anything but it must have the .config extension) and add the following values
+    </p>
+    <pre><code>
+option_settings:
+  - option_name: CUSTON_ENV
+    value: staging
+    </code></pre>
+
+    <p>
+        After you deploy your application you will see this new value under 
+        Environment Details -> Edit Configuration -> Container 
+        To prevent committing to your repository values like API keys, secrets and so on, you can put a placeholder value.
+    </p>
+    <pre><code>    
+option_settings:
+  - option_name: SOME_API_KEY
+    value: placeholder-value-change-me
+    </code></pre>
+    <p>
+       You can update the values in the AWS console. Updating the values in the config file, or removing it will not update the value in the console. 
+    </p>
+    
