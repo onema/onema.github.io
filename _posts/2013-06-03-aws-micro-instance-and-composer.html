@@ -1,0 +1,42 @@
+---
+layout: blogpost
+title: Using Composer in AWS EC2 micro instances
+category: devops
+tags: operations aws opsworks composer php
+year: 2013
+month: 6
+day: 3
+published: false
+summary: I ran into a problem using composer in aws micro instances. Here is a workaround for this issue. 
+---
+
+    <h2>Using Composer in AWS EC2 micro instances</h2>
+    <p>
+        I have a very simple recipe that downloads composer.phar and installs all
+        the dependencies for the package. While testing this recipe I ran into an 
+        a memory issue. 
+    </p>
+    <pre><code>
+
+$sudo php composer.phar install
+Loading composer repositories with package information
+Installing dependencies
+  - Installing symfony/event-dispatcher (dev-master 4b34aad)
+PHP Fatal error:  Uncaught exception 'ErrorException' with message 'proc_open(): fork failed - Cannot allocate memory' in phar:///srv/www/my_application_name/releases/20130603234158/composer.phar/vendor/symfony/console/Symfony/Component/Console/Application.php:975
+Stack trace:
+#0 [internal function]: Composer\Util\ErrorHandler::handle(2, 'proc_open(): fo...', 'phar:///srv/www...', 975, Array)
+    </code></pre>
+    <p>
+        A quick online search will reveal that this is a recurring problem that 
+        doesn't seem to be resolved. 
+    </p>
+    <p>
+       I also ran into the two articles below that describe how to use Memory Swap to address this issue. 
+       Check them out!
+    </p>
+    
+    <h3>References</h3>
+    <ol>
+        <li><a href="http://www.the-tech-tutorial.com/?p=1408">Adding Swap to any EC2 Instance</a></li>
+        <li><a href="http://jonathaningram.com.au/category/composerphp/">Symfony2, Composer, Capifony and an EC2 Micro instance</a></li>
+    </ol>
