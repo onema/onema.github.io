@@ -1,0 +1,59 @@
+---
+layout: blogpost
+title: Using Composer in AWS EC2 micro instances
+category: devops
+tags: operations aws opsworks composer php
+year: 2013
+month: 6
+day: 5
+published: true
+summary: I ran into a problem using composer in aws micro instances. Here is a workaround for this issue. 
+---
+
+    <h2>Using Composer in AWS OpsWorks + micro instances</h2>
+    <p>
+        I have a very simple recipe that downloads composer.phar and installs all
+        the dependencies for the package. While testing this recipe I ran into an 
+        a memory issue. 
+    </p>
+    <pre><code>
+$sudo php composer.phar install
+Loading composer repositories with package information
+Installing dependencies
+  - Installing symfony/event-dispatcher (dev-master 4b34aad)
+PHP Fatal error:  Uncaught exception 'ErrorException' with message 'proc_open(): fork failed - Cannot allocate memory' in phar:///srv/www/my_application_name/releases/20130603234158/composer.phar/vendor/symfony/console/Symfony/Component/Console/Application.php:975
+Stack trace:
+#0 [internal function]: Composer\Util\ErrorHandler::handle(2, 'proc_open(): fo...', 'phar:///srv/www...', 975, Array)
+...
+    </code></pre>
+    <p>
+        A quick online search will revealed that composer memory issues while running 
+        small VMs is a common problem. I even had this issue in a local VM. 
+    </p>
+    <p>
+       The simplest fix is to add more memory, but this could be a costly solution. 
+    </p>
+    <p>
+       In my case I addressed the problem by doing the following two things: 
+    </p>
+    <ul>
+        <li><strong>Ensure</strong> that the <code>composer.lock</code> file is part of the repository and/or it uses a new format</li>
+        <li>Add Memory Swap to the EC2 Instance</li>
+    </ul>
+    <p>
+       Articles [1] and [2] in the references below describe how to add Memory Swap to address this issue. 
+       But memory swap all by itself will not help if the lock file is not present 
+       or has an outdated format. See <a href="https://github.com/composer/composer/issues/945#issuecomment-8566081">here</a> for more info. 
+    </p>
+    <p>
+       It is also likely that new instances added to the OpsWorks layer will fail starting up because of the same issue. 
+       In this case you can create a new recipe to add swap on startup. This may be 
+       important if you have time based or load based instances.
+    </p>
+    
+    <h3>References</h3>
+    <ol>
+        <li><a href="http://www.the-tech-tutorial.com/?p=1408">Adding Swap to any EC2 Instance</a></li>
+        <li><a href="http://jonathaningram.com.au/category/composerphp/">Symfony2, Composer, Capifony and an EC2 Micro instance</a></li>
+        <li><a href="https://github.com/composer/composer/issues/945">ErrorException: proc_open(): fork failed - Cannot allocate memory in phar</a></li>
+    </ol>
