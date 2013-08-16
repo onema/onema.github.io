@@ -1,0 +1,92 @@
+---
+layout: blogpost
+title: Connecting an RDS database to your OpsWorks instance
+category: devops aws mysql rds
+tags: operations aws opsworks rds databases
+year: 2013
+month: 8
+day: 16
+published: true
+summary: OpsWorks offers a database layer, but it lacks some of the nice "managed" features RDS offers. Connecting an OpsWorks instance to an RDS DB is not to hard. Check it out. 
+---
+
+    <h2>Connecting an RDS database to your OpsWorks instance</h2>
+    <p>
+        According to Amazon <blockquote cite="http://aws.amazon.com/rds/">
+        &ldquo;Relational Database Service (Amazon RDS) is a web service that makes it easy to set up, 
+        operate, and scale a relational database in the cloud. It provides cost-efficient and 
+        resizable capacity while managing time-consuming database administration tasks, freeing 
+        you up to focus on your applications and business&rdquo;.</blockquote>
+    </p>
+    <p>
+        Unfortunately at this time there is not an "out of the box" feature in OpsWorks. Thankfully, 
+        getting an RDS connected is rather simple.
+    </p>
+    <p>
+        First go to the RDS Dashboard and select "Security Groups" and "Create DB Security Group". 
+    </p>
+    
+    <img src="/img/posts/rds-01.png" width="180" />
+    <img src="/img/posts/rds-02.png" width="280" />
+    
+    <p>
+        For the name use "opsworks" so we can identify it later and a description. Create the group.
+    </p>
+    
+    <img src="/img/posts/rds-03.png" width="350" />
+    
+    <p>
+        Select the group you just created to access the "Security Group Details". 
+        Choose EC2 Security Group as the Connection Type. You will be presented with a list of EC2 Security Groups. 
+    </p>
+    
+    <img src="/img/posts/rds-04.png" width="300" />
+    <img src="/img/posts/rds-05.png" width="600" />
+    <p>
+        You can select the "aws-opsworks-php-server" to give access to all your php applications 
+        (or the name of the security group your opsworks instances uses) and add it. You can also 
+        use an IP address or a range of addresses. 
+    </p>
+    
+    <img src="/img/posts/rds-06.png" width="300" />
+    <img src="/img/posts/rds-07.png" width="600" />
+    
+    <p>
+        Now if you have an existing DB, select it from the list of instances and modify it. 
+        Select the correct security group and check the box apply immediately. 
+    </p>
+    
+    <img src="/img/posts/rds-08.png" width="400" />
+    <img src="/img/posts/rds-09.png" width="500" />
+    
+    <p>
+        Please note that you can select multiple security groups, and if you select just one, whatever security group you had before
+        will be removed and instances currently using this database will no longer have access to it. 
+    </p>
+    
+    <p>
+        If you don't have an existing DB Launch a new DB instance and follow the Wizard. 
+        When you get to the section "Additional Configuration" select the opsworks security group you created above. 
+    </p>
+    
+    <img src="/img/posts/rds-10.png" width="400" />
+    <img src="/img/posts/rds-11.png" width="500" />
+    <p>
+        At this point all you need to do is setup your application to connect with the DB. 
+    </p>
+    <p>
+        <strong>Conclusion: </strong>While RDS is not part of the OpsWors stack (yet), setting it up and getting access to it
+        is just as simple as adding a new RDS security group and allowing OpsWorks instances access to it.
+        For more information on how to do this using Chef see the AWS Documentation section 
+        <a href="http://docs.aws.amazon.com/opsworks/latest/userguide/customizing-rds.html">"To connect the PHP App server to an RDS database"</a>. 
+        Alternatively you can check out my <a href="https://github.com/onema/opsworks-chef-cookbooks/blob/master/fuel/recipes/rdsconfig.rb">recipe for FuelPHP</a> 
+        to setup a different database for each application in the same stack. 
+        The documentation on how to use this recipe is <a href="https://github.com/onema/opsworks-chef-cookbooks#fuelrdsconfig">here</a>.
+    </p>
+    
+    <h3>References</h3>
+    <ol>
+        <li><a href="http://docs.aws.amazon.com/opsworks/latest/userguide/customizing-rds.html">Using RDS as a Backend Database</a></li>
+        <li><a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.html">Getting Started with Amazon RDS</a></li>
+        <li><a href="http://docs.aws.amazon.com/opsworks/latest/userguide/gettingstarted.walkthrough.phpapp.1.html">Step 1. Create a stack and deploy an app</a></li>
+    </ol>
