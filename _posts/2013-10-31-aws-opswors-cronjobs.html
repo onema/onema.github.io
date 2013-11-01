@@ -1,0 +1,85 @@
+---
+layout: blogpost
+title: Automating cronjob setup with Opsworks and Chef 
+category: devops aws opsworks chef cron
+tags: operations aws opsworks cronjobs
+year: 2013
+month: 10
+day: 31
+published: true
+summary: Setup of cronjobs without having to login to the server has been something I have never done until recently, see how.
+---
+
+    <h2>Automating cronjob setup with OpsWorks and Chef</h2>
+    <p>
+        In the past trying to automate recurring tasks has been a challenge. I remember 
+        trying to Emulate Cronjobs using AWS SWF, and it was a horrible pain, not to mention 
+        un-reliable, not because of SWF, but because of my workers crashing (This was the days before I discover supervisor). 
+
+        I even asked the this question on SO: <a href="http://stackoverflow.com/questions/14077095/aws-elastic-beanstalk-running-a-cronjob">AWS Elastic Beanstalk, running a cronjob</a>.
+    </p>
+    <p>
+        But now with OpsWorks setting up cronjobs is easier than ever. 
+        There is even a helpful <a href="http://docs.aws.amazon.com/opsworks/latest/userguide/workingcookbook-extend-cron.html">documentation entry</a> that is quite helpful!
+    </p>
+    <p>
+        The gist of it is to create a custom recipe to add each individual cronjob to the
+        crontab. 
+        <pre><code>
+cron "name_of_cron_entry" do
+  minute "0"
+  hour "20"
+  day "*"
+  month "10"
+  weekday "1-5"
+  action :create
+end
+        </code></pre>
+    </p>
+    
+    <p>
+        Although this means adding a new recipe every time you need a new cron job, which is annoying. 
+        I have taken this concept one step further and have created a custom recipe that uses the custom JSON 
+        values to add any Cron job you wish without having to modify or add your recipes. All you need to do
+        is add or modify the values in the custom JSON and re-deploy!
+    </p>
+    
+    <p>
+        The custom JSON would look like this:
+    </p>
+    
+    <pre>
+        <code>
+    {
+        "custom_env": {
+            "staging_site": {    ==> must be the application name
+                "cron_jobs": [  
+                    {
+                        // Send an email every sunday at 8:10
+                        "name": "send_email_sunday_8",
+                        "minute": "10", 
+                        "hour":   "8", 
+                        "month" :  "*",
+                        "weekday": "6",
+                        "command": "cd /srv/www/staging_site/current && php .lib/mailing.php" 
+                    },
+                    // Add more cronjobs here.
+                ]
+            }
+        }
+    }
+</code>
+    </pre>
+    <p>
+        See the recipe <a href="https://github.com/onema/opsworks-chef-cookbooks/blob/develop/cronjobs/recipes/default.rb">here</a>, and
+        The documentation on how to use the recipe can be found <a href="https://github.com/onema/opsworks-chef-cookbooks/blob/develop/README.md#cronjobs">here</a>.
+        
+        Be aware, I'm still testing it and that is why I have it in my develop branch.
+    </p>
+    
+    <p>Happy deployments!</p>
+    <h3>References</h3>
+    <ol>
+        <li><a href="http://docs.aws.amazon.com/opsworks/latest/userguide/workingcookbook-extend-cron.html">OpsWorks - Running Cron Jobs</a></li>
+        <li><a href="http://docs.opscode.com/chef/resources.html#cron">OpsCode Resources: Cron</a></li>
+    </ol>
